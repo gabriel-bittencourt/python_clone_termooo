@@ -1,10 +1,14 @@
 from colorama import Fore, Style
+import random
+from words import selected_words, all_words
 
 
 class Game:
 
-    def __init__(self, word):
-        self.word = list(word)
+    def __init__(self):
+        self.word = random.choice(selected_words)
+        print(f"Word: {self.word}")
+        self.words = all_words
 
     def show_match(self, word, patt):
 
@@ -19,12 +23,11 @@ class Game:
             print(Style.RESET_ALL, end="")
         print("\n")
 
-
     def match(self, guess):
 
         len_word = self.word.__len__()
 
-        cp_word = self.word[:]
+        cp_word = list(self.word)
 
         # Pattern
         # 0 -> not in word
@@ -65,19 +68,29 @@ class Game:
 
         return not (0 in patt or 2 in patt)
 
+    def loop(self):
+        correct = False
+        count = 1
+        guess = ""
 
-word = "ACASO"
-game = Game(word)
+        while (not correct) and (guess != "0") and (count < 7):
+            guess = input(f"{count}ª tentativa: ").upper()
 
-r = False
-g = ""
-c = 0
-while not r and not g == "0":
-    g = input("{}ª tentativa: ".format(c+1)).upper()
+            if len(guess) != 5:
+                print("Insira uma palavra de 5 letras\n")
+                continue
 
-    if len(g) != 5:
-        print("Insira uma palavra de 5 letras\n")
-        continue
+            if guess not in self.words:
+                print("Palavra inválida\n")
+                continue
 
-    r = game.match(g)
-    c += 1
+            correct = game.match(guess)
+            count += 1
+
+        if count == 7:
+            print(f"Palavra correta era: {self.word}")
+
+
+if __name__ == "__main__":
+    game = Game()
+    game.loop()
