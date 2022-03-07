@@ -1,5 +1,6 @@
 from colorama import Fore, Style
 import random
+import unidecode
 from words import selected_words, all_words
 
 
@@ -26,18 +27,23 @@ class Game:
 
         len_word = self.word.__len__()
 
-        cp_word = list(self.word)
+        # Remove accents
+        d_word = unidecode.unidecode(self.word)
+
+        cp_word = list(d_word)
+
+        # Remove accents
+        d_guess = unidecode.unidecode(guess)
 
         # Pattern
         # 0 -> not in word
-        # 1 -> right letter, right spot
-        # 2 -> right letter, wrong spot
+        # 1 -> right letter, right spot (green)
+        # 2 -> right letter, wrong spot (yellow)
         patt = [0] * len_word
 
-        att = {l : [] for l in self.word}
+        att = {l: [] for l in d_word}
 
-
-        for i, (l_word, l_guess) in enumerate(zip(self.word, guess)):
+        for i, (l_word, l_guess) in enumerate(zip(d_word, d_guess)):
 
             # Letter is not in the word
             if l_guess not in cp_word:
@@ -48,13 +54,13 @@ class Game:
                 patt[i] = 1
 
                 if len(att[l_guess]) >= cp_word.count(l_guess):
-                    patt[ att[l_guess].pop() ] = 0
-                
+                    patt[att[l_guess].pop()] = 0
+
                 cp_word.remove(l_guess)
 
             # Letter in wrong spot
             else:
-                if len(att[l_guess]) < cp_word.count(l_guess) :
+                if len(att[l_guess]) < cp_word.count(l_guess):
                     patt[i] = 2
 
                 else:
@@ -62,10 +68,12 @@ class Game:
 
                 att[l_guess].append(i)
 
-
         self.show_match(guess, patt)
 
-        return not (0 in patt or 2 in patt)
+        return patt
+
+    def check(self, pattern):
+        return not (0 in pattern or 2 in pattern)
 
     def loop(self):
         correct = False
@@ -83,7 +91,8 @@ class Game:
                 print("Palavra inválida\n")
                 continue
 
-            correct = game.match(guess)
+            patt = game.match(guess)
+            correct = game.check(patt)
             count += 1
 
         if count == 7:
