@@ -7,7 +7,6 @@ class Game:
 
     def __init__(self):
         self.word = random.choice(selected_words)
-        print(f"Word: {self.word}")
         self.words = all_words
 
     def show_match(self, word, patt):
